@@ -1,0 +1,80 @@
+# CI de nivel 04 - Disparo dos testes dentro do pipe dev
+name: 'Execução Integrada'
+
+on:
+  workflow_dispatch:
+
+jobs:
+  inspecao: # análise estatica de código, onde se não temos erros sintático ..regras definidas pelo time (inspeção de segurança, padronização de código..)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalando Yarn
+        run: npm install -g yarn
+
+      - name: Instalando dependências
+        run: yarn
+
+      - name: Checando padronizacao do código
+        run: yarn lint
+
+  unidade:
+    runs-on: ubuntu-latest
+    needs: [inspecao]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalando Yarn # yarn pode ser omitido assim como o node foi, pois já temos instalado no node
+        run: npm install -g yarn
+
+      - name: Instalando dependências
+        run: yarn
+
+      - name: Executando testes de unidade
+        run: yarn test
+
+  e2e-tests:
+    runs-on: ubuntu-latest
+    needs: [inspecao]
+
+    steps:
+      # clone do projeto
+      - uses: actions/checkout@v4
+
+      # instalação do node
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+
+      # instalação do Yarn
+      - name: Instalando Yarn
+        run: npm install -g yarn
+
+      # instalação das dependências
+      - name: Instalando dependências
+        run: yarn
+
+      # Instalação do Playwrigth
+      - name: Instalando Playwright
+        run: yarn playwright install
+
+      # executar os testes e2e
+      - name: Executando Testes E2E
+        run: yarn run e2e
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled()}} # se o pipe não foi cancelado roda o step abaixo
+        with:
+          name: relatorio
+          path: ./playwright-report
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [e2e-tests]
+
+    steps:
+      - name: Simulação do Deploy
+        run: echo "simulando o deploy com sucesso"
