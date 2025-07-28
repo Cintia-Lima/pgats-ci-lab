@@ -35,8 +35,4 @@ jobs:
       - name: Executando trabalhoFinal
         run: npx mocha trabalho/trabalho-final.js
 
-      - uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
-        with:
-          name: relatorio
-          path: ./playwright-report  
+     
