@@ -1,0 +1,43 @@
+# CI de Nível 01 - Disparo agendado a partir de 1 clique
+
+# nome do nosso 'pipeline'
+name: 'Execução Agendada'
+
+# regras de disparo ( gatilhos/triggers)
+# gatilho de exec manual = workflow_dispatch
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+
+# trabalhos/terefas dentro do pipeline
+jobs:
+  e2e-tests:
+    # maquina que o job vai executar
+    runs-on: ubuntu-latest
+
+    # passos do script de build
+    steps:
+      # clone do projeto
+      - uses: actions/checkout@v4
+
+      # instalação do node
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+
+      # instalação do Yarn
+      - name: Instalando Yarn
+        run: npm install -g yarn
+
+      # instalação das dependências
+      - name: Instalando dependências
+        run: yarn
+
+      # Instalação do Playwrigth
+      - name: Instalando Playwright
+        run: yarn playwright install
+
+      # executar os testes e2e
+      - name: Executando Testes E2E
+        run: yarn run e2e
