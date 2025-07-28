@@ -34,7 +34,7 @@ jobs:
       # executar os testes Trabalho Final
       - name: Executando trabalhoFinal
         run: npx mocha trabalho/trabalho-final.js
-        
+
 
       - name: Criar relatório dos testes
         uses: actions/upload-artifact@v4
